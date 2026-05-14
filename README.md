@@ -126,3 +126,8 @@ Suporte a `.env` via `python-dotenv` para configurações sensibles.
 - [ ] CI/CD pipeline (GitHub Actions)
 - [ ] Metrics e monitoring (Prometheus)
 - [ ] Graceful shutdown handling
+
+
+License
+
+This project is licensed under the MIT License.
