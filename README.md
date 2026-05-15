@@ -2,75 +2,120 @@
 
 ![CI/CD](https://github.com/Agostinho-neto/k8s-volley-platform/actions/workflows/pipeline.yml/badge.svg)
 
-API REST para gerenciamento de jogadores de vôlei com foco em arquitetura escalável e praticas de SRE.
+API REST para gerenciamento de jogadores de volei com foco em arquitetura escalavel e praticas de SRE.
 
-## 🎯 Visão Geral
+## Visao Geral
 
-Plataforma backend para administração de clubes de vôlei. Gerencia cadastro, listagem e organização de jogadores com endpoints RESTful, validação de dados através de schemas Pydantic e containerização para deployment em qualquer ambiente.
+Plataforma backend para administracao de clubes de volei. Gerencia cadastro e listagem de jogadores com endpoints RESTful, validacao de dados com schemas Pydantic, persistencia em banco relacional e containerizacao para execucao local ou deployment em ambientes orquestrados.
 
-## 🏗️ Stack Técnico
+## Stack Tecnico
 
 - **Framework**: FastAPI 0.136
 - **Python**: 3.12-slim
 - **Server**: Uvicorn ASGI
-- **Validação**: Pydantic v2
-- **Container**: Docker
+- **Validacao**: Pydantic v2
+- **ORM**: SQLAlchemy 2
+- **Database**: PostgreSQL
+- **Migrations**: Alembic
+- **Container**: Docker e Docker Compose
 - **Linting**: Ruff
 - **Testing**: Pytest
+- **CI/CD**: GitHub Actions
 
-## 🚀 Arquitetura
+## Arquitetura
 
-```
+```text
 app/
-├── main.py          # Entry point da aplicação
-├── routes/          # Endpoints da API
-│   └── players.py   # CRUD de jogadores
-└── schemas/         # Modelos Pydantic
-    └── player.py    # Schema Player
+|-- main.py              # Entry point da aplicacao
+|-- database.py          # Engine, session e dependencia de banco
+|-- models/              # Models SQLAlchemy
+|   `-- player.py        # Tabela players
+|-- repositories/        # Acesso ao banco de dados
+|   `-- player.py        # Queries de jogadores
+|-- routes/              # Endpoints da API
+|   `-- players.py       # Rotas de jogadores
+`-- schemas/             # Modelos Pydantic
+    `-- player.py        # Schemas de entrada e saida
+
+alembic/
+`-- versions/            # Migrations versionadas do banco
 ```
 
-**Estrutura modular**: Separação clara entre routes, schemas e business logic facilita manutenção e testes.
+**Estrutura modular**: Separacao entre routes, schemas, models, repositories e database facilita manutencao, testes e evolucao para uma aplicacao mais proxima de producao.
 
-## 📋 Endpoints
+## Endpoints
 
 ### Jogadores
 
-| Método | Endpoint | Descrição |
+| Metodo | Endpoint | Descricao |
 |--------|----------|-----------|
 | POST | `/players` | Criar novo jogador |
 | GET | `/players` | Listar todos os jogadores |
 
 **Request Body (POST):**
+
 ```json
 {
-  "name": "João Silva",
+  "name": "Joao Silva",
   "position": "Levantador",
   "number": 10
 }
 ```
 
-## 🐳 Docker
+**Response:**
+
+```json
+{
+  "id": 1,
+  "name": "Joao Silva",
+  "position": "Levantador",
+  "number": 10,
+  "created_at": "2026-05-15T19:57:22",
+  "updated_at": "2026-05-15T19:57:22"
+}
+```
+
+## Docker
 
 Imagem otimizada:
 
 ```dockerfile
-FROM python:3.12-slim       # Base image leve
-RUN pip install --no-cache  # Reduz tamanho
-COPY . .                     # Cópia de código
-CMD uvicorn app.main:app    # Execução
+FROM python:3.12-slim
+RUN pip install --no-cache-dir -r requirements.txt
+COPY . .
+CMD uvicorn app.main:app
 ```
 
 **Build e Run:**
+
 ```bash
 docker build -t volleyops .
 docker run -p 8000:8000 volleyops
 ```
 
-## 💻 Desenvolvimento Local
+## Docker Compose
+
+O projeto possui `docker-compose.yml` com API e PostgreSQL.
+
+```bash
+docker compose up --build
+```
+
+O Compose executa as migrations com Alembic antes de subir a API.
+
+Acesse:
+
+```text
+http://localhost:8000/docs
+```
+
+## Desenvolvimento Local
 
 ### Requisitos
+
 - Python 3.12+
 - pip
+- Docker e Docker Compose
 
 ### Setup
 
@@ -84,17 +129,45 @@ python -m venv venv
 # Ativar (Linux/Mac)
 source venv/bin/activate
 
-# Instalar dependências
+# Instalar dependencias
 pip install -r requirements.txt
 ```
 
-### Executar servidor
+### Variaveis de Ambiente
+
+Copie o exemplo de ambiente:
+
+```bash
+cp .env.example .env
+```
+
+Exemplo:
+
+```env
+DATABASE_URL=postgresql://volleyops:volleyops@localhost:5432/volleyops
+```
+
+### Migrations
+
+Aplicar migrations:
+
+```bash
+alembic upgrade head
+```
+
+Criar uma nova migration apos alterar models:
+
+```bash
+alembic revision --autogenerate -m "describe change"
+```
+
+### Executar Servidor
 
 ```bash
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-Acesse: http://localhost:8000/docs (Swagger UI)
+Acesse: http://localhost:8000/docs
 
 ### Testes
 
@@ -102,32 +175,54 @@ Acesse: http://localhost:8000/docs (Swagger UI)
 pytest
 ```
 
-## 🔧 Práticas SRE Implementadas
+### Lint
 
-✅ **Containerização**: Dockerfile otimizado para produção  
-✅ **Versionamento**: Dependências congeladas em requirements.txt  
-✅ **Linting**: Ruff para qualidade de código  
-✅ **Validação**: Pydantic para data validation  
-✅ **Modularidade**: Design pronto para escalabilidade  
+```bash
+ruff check .
+```
 
-## 📦 Dependências
+## CI/CD
 
-Todas as dependências estão congeladas em `requirements.txt` com versões específicas para reprodutibilidade.
+O workflow em `.github/workflows/pipeline.yml` executa:
 
-## 🔐 Variáveis de Ambiente
+- Checkout do repositorio
+- Setup do Python 3.12
+- Instalacao de dependencias
+- PostgreSQL como service container
+- Ruff
+- Alembic migrations
+- Pytest
+- Build da imagem Docker
+- Push da imagem para Docker Hub
 
-Suporte a `.env` via `python-dotenv` para configurações sensibles.
+## Praticas SRE Implementadas
 
-## 📈 Roadmap
+- **Containerizacao**: Dockerfile para empacotar a aplicacao
+- **Ambiente local reproduzivel**: Docker Compose com API e PostgreSQL
+- **Versionamento de banco**: Alembic para migrations
+- **Persistencia relacional**: PostgreSQL com SQLAlchemy
+- **Versionamento de dependencias**: `requirements.txt` com versoes especificas
+- **Linting**: Ruff para qualidade de codigo
+- **Validacao**: Pydantic para data validation
+- **CI/CD**: GitHub Actions com banco em pipeline
+- **Modularidade**: Separacao entre rotas, schemas, models e repositories
+
+## Dependencias
+
+Todas as dependencias estao congeladas em `requirements.txt` com versoes especificas para reprodutibilidade.
+
+## Roadmap
 
 - [ ] Health check endpoint (`/health`)
+- [ ] Readiness check com validacao de banco (`/ready`)
 - [ ] Logging estruturado (JSON)
-- [ ] Database integration (PostgreSQL)
-- [ ] CI/CD pipeline (GitHub Actions)
+- [x] Database integration (PostgreSQL)
+- [x] CI/CD pipeline (GitHub Actions)
 - [ ] Metrics e monitoring (Prometheus)
+- [ ] Dashboards de observabilidade
 - [ ] Graceful shutdown handling
+- [ ] Kubernetes manifests
 
-
-License
+## License
 
 This project is licensed under the MIT License.

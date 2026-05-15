@@ -8,6 +8,23 @@ on:
 jobs:
   ci:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: volleyops_test
+          POSTGRES_USER: volleyops
+          POSTGRES_PASSWORD: volleyops
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U volleyops -d volleyops_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://volleyops:volleyops@localhost:5432/volleyops_test
 
     steps:
       - name: Checkout repository
@@ -26,6 +43,10 @@ jobs:
       - name: Run Ruff
         run: |
           ruff check .
+
+      - name: Run Database Migrations
+        run: |
+          alembic upgrade head
 
       - name: Run Tests
         run: |

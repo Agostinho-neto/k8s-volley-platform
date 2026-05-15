@@ -12,6 +12,9 @@ env/
 # Environment variables
 .env
 
+# Local databases
+*.db
+
 # IDEs
 .vscode/
 .idea/
