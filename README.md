@@ -2,11 +2,11 @@
 
 ![CI/CD](https://github.com/Agostinho-neto/k8s-volley-platform/actions/workflows/pipeline.yml/badge.svg)
 
-API REST para gerenciamento de jogadores de volei com foco em arquitetura escalavel e praticas de SRE.
+Aplicacao web e API REST para gerenciamento de jogadores de volei com foco em arquitetura escalavel e praticas de SRE.
 
 ## Visao Geral
 
-Plataforma backend para administracao de clubes de volei. Gerencia cadastro e listagem de jogadores com endpoints RESTful, validacao de dados com schemas Pydantic, persistencia em banco relacional e containerizacao para execucao local ou deployment em ambientes orquestrados.
+Plataforma para administracao de clubes de volei. Gerencia cadastro, listagem, alteracao e remocao de jogadores com interface web, endpoints RESTful, validacao de dados com schemas Pydantic, persistencia em banco relacional e containerizacao para execucao local ou deployment em ambientes orquestrados.
 
 ## Stack Tecnico
 
@@ -21,6 +21,7 @@ Plataforma backend para administracao de clubes de volei. Gerencia cadastro e li
 - **Linting**: Ruff
 - **Testing**: Pytest
 - **CI/CD**: GitHub Actions
+- **Frontend**: HTML, CSS e JavaScript
 
 ## Arquitetura
 
@@ -34,6 +35,10 @@ app/
 |   `-- player.py        # Queries de jogadores
 |-- routes/              # Endpoints da API
 |   `-- players.py       # Rotas de jogadores
+|-- static/              # Interface web
+|   |-- index.html       # Tela de gerenciamento
+|   |-- styles.css       # Estilos da interface
+|   `-- app.js           # Consumo da API via fetch
 `-- schemas/             # Modelos Pydantic
     `-- player.py        # Schemas de entrada e saida
 
@@ -45,14 +50,24 @@ alembic/
 
 ## Endpoints
 
+### Web
+
+| Metodo | Endpoint | Descricao |
+|--------|----------|-----------|
+| GET | `/` | Interface web da aplicacao |
+| GET | `/docs` | Swagger UI da API |
+
 ### Jogadores
 
 | Metodo | Endpoint | Descricao |
 |--------|----------|-----------|
 | POST | `/players` | Criar novo jogador |
 | GET | `/players` | Listar todos os jogadores |
+| GET | `/players/{player_id}` | Buscar jogador por ID |
+| PUT | `/players/{player_id}` | Alterar jogador |
+| DELETE | `/players/{player_id}` | Remover jogador |
 
-**Request Body (POST):**
+**Request Body (POST/PUT):**
 
 ```json
 {
@@ -106,6 +121,7 @@ O Compose executa as migrations com Alembic antes de subir a API.
 Acesse:
 
 ```text
+http://localhost:8000
 http://localhost:8000/docs
 ```
 
@@ -167,7 +183,12 @@ alembic revision --autogenerate -m "describe change"
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-Acesse: http://localhost:8000/docs
+Acesse:
+
+```text
+http://localhost:8000
+http://localhost:8000/docs
+```
 
 ### Testes
 
@@ -201,6 +222,8 @@ O workflow em `.github/workflows/pipeline.yml` executa:
 - **Ambiente local reproduzivel**: Docker Compose com API e PostgreSQL
 - **Versionamento de banco**: Alembic para migrations
 - **Persistencia relacional**: PostgreSQL com SQLAlchemy
+- **CRUD completo**: Criacao, leitura, atualizacao e remocao de jogadores
+- **Interface web**: Tela simples para operar a API
 - **Versionamento de dependencias**: `requirements.txt` com versoes especificas
 - **Linting**: Ruff para qualidade de codigo
 - **Validacao**: Pydantic para data validation

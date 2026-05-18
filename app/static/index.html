@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Volley Club Platform</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">VolleyOps</p>
+        <h1>Jogadores</h1>
+      </div>
+      <div class="status" id="status">Carregando</div>
+    </header>
+
+    <main class="shell">
+      <section class="form-panel" aria-labelledby="form-title">
+        <div class="section-head">
+          <h2 id="form-title">Cadastro</h2>
+          <button class="icon-button secondary" id="reset-button" type="button" title="Limpar formulario" aria-label="Limpar formulario">
+            X
+          </button>
+        </div>
+
+        <form id="player-form">
+          <input type="hidden" id="player-id" />
+
+          <label for="name">Nome</label>
+          <input id="name" name="name" type="text" minlength="2" maxlength="100" required />
+
+          <label for="position">Posicao</label>
+          <select id="position" name="position" required>
+            <option value="Levantador">Levantador</option>
+            <option value="Oposto">Oposto</option>
+            <option value="Ponteiro">Ponteiro</option>
+            <option value="Central">Central</option>
+            <option value="Libero">Libero</option>
+          </select>
+
+          <label for="number">Numero</label>
+          <input id="number" name="number" type="number" min="1" required />
+
+          <button class="primary" id="submit-button" type="submit">Salvar</button>
+        </form>
+      </section>
+
+      <section class="list-panel" aria-labelledby="list-title">
+        <div class="section-head">
+          <div>
+            <h2 id="list-title">Elenco</h2>
+            <p id="player-count">0 jogadores</p>
+          </div>
+          <button class="icon-button" id="refresh-button" type="button" title="Atualizar lista" aria-label="Atualizar lista">
+            R
+          </button>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>Posicao</th>
+                <th>Numero</th>
+                <th>Acoes</th>
+              </tr>
+            </thead>
+            <tbody id="players-table"></tbody>
+          </table>
+          <div class="empty" id="empty-state">Nenhum jogador cadastrado</div>
+        </div>
+      </section>
+    </main>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>

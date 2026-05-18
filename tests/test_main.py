@@ -23,6 +23,7 @@ def test_root():
         response = client.get("/")
 
     assert response.status_code == 200
+    assert "text/html" in response.headers["content-type"]
 
 
 def test_create_player():
@@ -74,3 +75,83 @@ def test_create_player_validates_number():
         )
 
     assert response.status_code == 422
+
+
+def test_get_player_by_id():
+    with TestClient(app) as client:
+        created = client.post(
+            "/players",
+            json={
+                "name": "Joao Silva",
+                "position": "Levantador",
+                "number": 10,
+            },
+        )
+        response = client.get(f"/players/{created.json()['id']}")
+
+    assert response.status_code == 200
+    assert response.json()["name"] == "Joao Silva"
+
+
+def test_update_player():
+    with TestClient(app) as client:
+        created = client.post(
+            "/players",
+            json={
+                "name": "Joao Silva",
+                "position": "Levantador",
+                "number": 10,
+            },
+        )
+        response = client.put(
+            f"/players/{created.json()['id']}",
+            json={
+                "name": "Maria Souza",
+                "position": "Oposto",
+                "number": 7,
+            },
+        )
+
+    assert response.status_code == 200
+    assert response.json()["name"] == "Maria Souza"
+    assert response.json()["position"] == "Oposto"
+    assert response.json()["number"] == 7
+
+
+def test_delete_player():
+    with TestClient(app) as client:
+        created = client.post(
+            "/players",
+            json={
+                "name": "Joao Silva",
+                "position": "Levantador",
+                "number": 10,
+            },
+        )
+        player_id = created.json()["id"]
+        delete_response = client.delete(f"/players/{player_id}")
+        get_response = client.get(f"/players/{player_id}")
+
+    assert delete_response.status_code == 204
+    assert get_response.status_code == 404
+
+
+def test_update_player_not_found():
+    with TestClient(app) as client:
+        response = client.put(
+            "/players/999",
+            json={
+                "name": "Maria Souza",
+                "position": "Oposto",
+                "number": 7,
+            },
+        )
+
+    assert response.status_code == 404
+
+
+def test_delete_player_not_found():
+    with TestClient(app) as client:
+        response = client.delete("/players/999")
+
+    assert response.status_code == 404

@@ -9,6 +9,10 @@ class PlayerCreate(BaseModel):
     number: int = Field(gt=0)
 
 
+class PlayerUpdate(PlayerCreate):
+    pass
+
+
 class PlayerResponse(PlayerCreate):
     id: int
     created_at: datetime
