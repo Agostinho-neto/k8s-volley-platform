@@ -46,6 +46,17 @@ def test_create_player():
     assert "updated_at" in response.json()
 
 
+def test_request_id_header_is_returned():
+    with TestClient(app) as client:
+        response = client.get(
+            "/players",
+            headers={"X-Request-ID": "test-request-123"},
+        )
+
+    assert response.status_code == 200
+    assert response.headers["X-Request-ID"] == "test-request-123"
+
+
 def test_list_players():
     with TestClient(app) as client:
         client.post(
