@@ -229,16 +229,17 @@ O workflow em `.github/workflows/pipeline.yml` executa:
 - **Validacao**: Pydantic para data validation
 - **CI/CD**: GitHub Actions com banco em pipeline
 - **Modularidade**: Separacao entre rotas, schemas, models e repositories
+- **Logging estruturado**: logs em JSON no stdout com request ID, rota, status code e latencia
 
 ## Dependencias
-
+1
 Todas as dependencias estao congeladas em `requirements.txt` com versoes especificas para reprodutibilidade.
 
 ## Roadmap
 
 - [ ] Health check endpoint (`/health`)
 - [ ] Readiness check com validacao de banco (`/ready`)
-- [ ] Logging estruturado (JSON)
+- [x] Logging estruturado (JSON)
 - [x] Database integration (PostgreSQL)
 - [x] CI/CD pipeline (GitHub Actions)
 - [ ] Metrics e monitoring (Prometheus)
