@@ -232,7 +232,7 @@ O workflow em `.github/workflows/pipeline.yml` executa:
 - **Logging estruturado**: logs em JSON no stdout com request ID, rota, status code e latencia
 
 ## Dependencias
-1
+
 Todas as dependencias estao congeladas em `requirements.txt` com versoes especificas para reprodutibilidade.
 
 ## Roadmap
